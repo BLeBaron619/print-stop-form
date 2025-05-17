@@ -15,7 +15,7 @@
   </style>
 </head>
 <body>
-  <form id="quoteForm" action="/submit" method="POST" enctype="multipart/form-data">
+  <form id="quoteForm" enctype="multipart/form-data">
     <h2>Order Quote Request</h2>
     <label for="name">Contact Name</label>
     <input type="text" id="name" name="name" required>
@@ -23,14 +23,39 @@
     <label for="email">Email</label>
     <input type="email" id="email" name="email" required>
 
-    <label for="unit">Unit Name</label>
+    <label for="unit">Unit/Company/Organization Name</label>
     <input type="text" id="unit" name="unit">
 
     <label for="gearType">Type of Gear</label>
     <select id="gearType" name="gearType">
-      <option value="shirt">Shirt</option>
+      <option value="shortSleeve">Short Sleeve Shirt</option>
+      <option value="longSleeve">Long Sleeve Shirt</option>
+      <option value="polo">Polo</option>
       <option value="hat">Hat</option>
       <option value="hoodie">Hoodie</option>
+      <option value="crewneck">Crew Neck Sweater</option>
+    </select>
+
+    <label for="color">Color</label>
+    <select id="color" name="color">
+      <option value="black">Black</option>
+      <option value="white">White</option>
+      <option value="red">Red</option>
+      <option value="blue">Blue</option>
+      <option value="green">Green</option>
+      <option value="yellow">Yellow</option>
+      <option value="gray">Gray</option>
+      <option value="orange">Orange</option>
+      <option value="purple">Purple</option>
+    </select>
+
+    <label for="printLocation">Print Location</label>
+    <select id="printLocation" name="printLocation">
+      <option value="leftChest">Left Chest Only</option>
+      <option value="backOnly">Back Only</option>
+      <option value="chestAndBack">Left Chest and Back</option>
+      <option value="largeChestAndBack">Large Chest and Back</option>
+      <option value="hat">Hat</option>
     </select>
 
     <label for="quantity">Quantity</label>
@@ -57,5 +82,20 @@
     <button type="submit">Get Quote</button>
     <div class="result" id="quoteResult"></div>
   </form>
+
+  <script>
+    document.getElementById("quoteForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const quantity = parseInt(document.getElementById("quantity").value);
+      const printType = document.getElementById("printType").value;
+
+      // Basic pricing logic
+      let pricePerItem = printType === "embroidery" ? 18 : 12;
+      const total = pricePerItem * quantity;
+
+      document.getElementById("quoteResult").innerText = `Estimated Quote: $${total.toFixed(2)} (subject to design review)`;
+    });
+  </script>
 </body>
 </html>
