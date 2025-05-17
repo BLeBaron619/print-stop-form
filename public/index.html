@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Print Stop - Order Quote Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
+    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; }
+    label { display: block; margin: 15px 0 5px; }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 20px; padding: 12px 20px; background: #222; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    .result { margin-top: 20px; font-weight: bold; text-align: center; }
+  </style>
+</head>
+<body>
+  <form id="quoteForm" action="/submit" method="POST" enctype="multipart/form-data">
+    <h2>Order Quote Request</h2>
+    <label for="name">Contact Name</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="unit">Unit Name</label>
+    <input type="text" id="unit" name="unit">
+
+    <label for="gearType">Type of Gear</label>
+    <select id="gearType" name="gearType">
+      <option value="shirt">Shirt</option>
+      <option value="hat">Hat</option>
+      <option value="hoodie">Hoodie</option>
+    </select>
+
+    <label for="quantity">Quantity</label>
+    <input type="number" id="quantity" name="quantity" min="1" required>
+
+    <label for="printType">Print Type</label>
+    <select id="printType" name="printType">
+      <option value="screen">Screen Printing</option>
+      <option value="embroidery">Embroidery</option>
+    </select>
+
+    <label for="deadline">Deadline</label>
+    <input type="date" id="deadline" name="deadline">
+
+    <label for="zipcode">Shipping Zip Code</label>
+    <input type="text" id="zipcode" name="zipcode">
+
+    <label for="logo">Upload Logo or Design</label>
+    <input type="file" id="logo" name="logo" accept="image/*">
+
+    <label for="notes">Additional Notes or Requests</label>
+    <textarea id="notes" name="notes" rows="4"></textarea>
+
+    <button type="submit">Get Quote</button>
+    <div class="result" id="quoteResult"></div>
+  </form>
+</body>
+</html>
