@@ -32,7 +32,7 @@ app.post('/submit', upload.single('logo'), (req, res) => {
     service: 'gmail',
     auth: {
       user: 'theprintstop619@gmail.com',
-      pass: 'obsfjhdpuxtuuoha' // App password — make sure there are NO SPACES
+      pass: 'wskosgvfpdohxypl' // App password — no spaces
     }
   });
 
@@ -63,23 +63,32 @@ Notes: ${notes}
     } else {
       console.log('Internal email sent:', info.response);
 
-      // Send confirmation email to customer
+      // Send HTML confirmation email to customer
       if (email) {
         const customerMailOptions = {
-          from: 'theprintstop619@gmail.com',
+          from: '"The Print Stop" <theprintstop619@gmail.com>',
           to: email,
           subject: 'Thank you for your quote request',
-          text: `
-Hi ${name},
-
-Thank you for reaching out to The Print Stop! We’ve received your request and will review your information shortly.
-
-If we have any questions or need clarification, we’ll be in touch. Otherwise, expect a quote from us soon.
-
-We appreciate the opportunity to serve you.
-
-Best regards,  
-The Print Stop Team
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
+              <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                <h2 style="color: #333;">Thank you, ${name}!</h2>
+                <p style="font-size: 16px; color: #555;">
+                  We’ve received your quote request and our team is reviewing the details.
+                </p>
+                <p style="font-size: 16px; color: #555;">
+                  You can expect a follow-up from us soon with pricing or questions if we need anything clarified.
+                </p>
+                <p style="font-size: 16px; color: #555;">
+                  We appreciate the opportunity to serve your unit, team, or organization!
+                </p>
+                <hr style="margin: 30px 0;">
+                <p style="font-size: 14px; color: #888;">
+                  The Print Stop<br>
+                  theprintstop619@gmail.com
+                </p>
+              </div>
+            </div>
           `
         };
 
