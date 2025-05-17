@@ -32,7 +32,7 @@ app.post('/submit', upload.single('logo'), (req, res) => {
     service: 'gmail',
     auth: {
       user: 'theprintstop619@gmail.com',
-      pass: 'wskosgvfpdohxypl' // No spaces here!
+      pass: 'obsfjhdpuxtuuoha' // App password — make sure there are NO SPACES
     }
   });
 
@@ -61,6 +61,8 @@ Notes: ${notes}
       console.error('Failed to send internal email:', error);
       return res.send('Error sending email.');
     } else {
+      console.log('Internal email sent:', info.response);
+
       // Send confirmation email to customer
       if (email) {
         const customerMailOptions = {
