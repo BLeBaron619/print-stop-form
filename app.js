@@ -31,8 +31,8 @@ app.post('/submit', upload.single('logo'), (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.theprintstop619@gmail.com,
-      pass: process.env.wsko sgvf pdoh xypl
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
     }
   });
 
