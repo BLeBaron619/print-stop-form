@@ -15,7 +15,7 @@
   </style>
 </head>
 <body>
-  <form id="quoteForm" enctype="multipart/form-data">
+  <form id="quoteForm" action="/submit" method="POST" enctype="multipart/form-data">
     <h2>Order Quote Request</h2>
     <label for="name">Contact Name</label>
     <input type="text" id="name" name="name" required>
@@ -82,20 +82,5 @@
     <button type="submit">Get Quote</button>
     <div class="result" id="quoteResult"></div>
   </form>
-
-  <script>
-    document.getElementById("quoteForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      const quantity = parseInt(document.getElementById("quantity").value);
-      const printType = document.getElementById("printType").value;
-
-      // Basic pricing logic
-      let pricePerItem = printType === "embroidery" ? 18 : 12;
-      const total = pricePerItem * quantity;
-
-      document.getElementById("quoteResult").innerText = `Estimated Quote: $${total.toFixed(2)} (subject to design review)`;
-    });
-  </script>
 </body>
 </html>
