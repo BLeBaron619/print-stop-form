@@ -31,13 +31,13 @@ app.post('/submit', upload.single('logo'), (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+      user: 'theprintstop619@gmail.com',
+      pass: 'wskosgvfpdohxypl' // No spaces here!
     }
   });
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: 'theprintstop619@gmail.com',
     to: 'theprintstop619@gmail.com',
     subject: 'New Order Quote Request',
     text: `
@@ -58,12 +58,13 @@ Notes: ${notes}
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
+      console.error('Failed to send internal email:', error);
       return res.send('Error sending email.');
     } else {
       // Send confirmation email to customer
       if (email) {
         const customerMailOptions = {
-          from: process.env.EMAIL_USER,
+          from: 'theprintstop619@gmail.com',
           to: email,
           subject: 'Thank you for your quote request',
           text: `
