@@ -33,7 +33,7 @@ app.post('/submit', upload.single('logo'), (req, res) => {
     service: 'gmail',
     auth: {
       user: 'theprintstop619@gmail.com',
-      pass: 'ASDfghjkl123!!'
+      pass: 'zzke qwph oggg qabl'
     }
   });
 
