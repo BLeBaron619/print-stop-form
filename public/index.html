@@ -6,7 +6,7 @@
   <title>The Print Stop - Order Quote Form</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 100%; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     h2 { text-align: center; }
     label { display: block; margin: 15px 0 5px; }
     input, select, textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
@@ -46,6 +46,62 @@
   <form id="quoteForm" action="/submit" method="POST" enctype="multipart/form-data">
     <h2>Order Quote Request</h2>
 
+    <label for="name">Contact Name</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="unit">Unit/Company/Organization Name</label>
+    <input type="text" id="unit" name="unit" />
+
+    <label for="gearType">Type of Gear</label>
+    <select id="gearType" name="gearType">
+      <option value="shortSleeve">Short Sleeve Shirt</option>
+      <option value="longSleeve">Long Sleeve Shirt</option>
+      <option value="polo">Polo</option>
+      <option value="hat">Hat</option>
+      <option value="hoodie">Hoodie</option>
+      <option value="crewneck">Crew Neck Sweater</option>
+    </select>
+
+    <label for="color">Color</label>
+    <select id="color" name="color">
+      <option value="black">Black</option>
+      <option value="white">White</option>
+      <option value="red">Red</option>
+      <option value="blue">Blue</option>
+      <option value="green">Green</option>
+      <option value="yellow">Yellow</option>
+      <option value="gray">Gray</option>
+      <option value="orange">Orange</option>
+      <option value="purple">Purple</option>
+    </select>
+
+    <label for="printLocation">Print Location</label>
+    <select id="printLocation" name="printLocation">
+      <option value="leftChest">Left Chest Only</option>
+      <option value="backOnly">Back Only</option>
+      <option value="chestAndBack">Left Chest and Back</option>
+      <option value="largeChestAndBack">Large Chest and Back</option>
+      <option value="hat">Hat</option>
+    </select>
+
+    <label for="printType">Print Type</label>
+    <select id="printType" name="printType">
+      <option value="screen">Screen Printing</option>
+      <option value="embroidery">Embroidery</option>
+    </select>
+
+    <label for="deadline">Deadline</label>
+    <input type="date" id="deadline" name="deadline" />
+
+    <label for="zipcode">Shipping Zip Code</label>
+    <input type="text" id="zipcode" name="zipcode" />
+
+    <label for="logo">Upload Logo or Design</label>
+    <input type="file" id="logo" name="logo" accept="image/*" />
+
     <label for="sizeXS">XS</label>
     <select id="sizeXS" name="sizeXS"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
 
@@ -71,6 +127,11 @@
     <input type="number" id="quantity" name="quantity" readonly />
 
     <div class="summary" id="sizeSummary"></div>
+
+    <label for="notes">Additional Notes or Requests</label>
+    <textarea id="notes" name="notes" rows="4"></textarea>
+
+    <button type="submit">Get Quote</button>
   </form>
 </body>
 </html>
