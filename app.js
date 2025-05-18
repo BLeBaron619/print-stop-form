@@ -6,7 +6,7 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Set up storage engine
+// Set up multer storage
 const storage = multer.diskStorage({
   destination: './uploads/',
   filename: (req, file, cb) => {
@@ -19,11 +19,12 @@ const upload = multer({ storage });
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-// POST route to handle form submission
+// POST route for form submission
 app.post('/submit', upload.single('logo'), (req, res) => {
   const {
     name, email, unit, gearType, color, printLocation,
-    size, quantity, printType, deadline, zipcode, notes
+    sizeXS, sizeS, sizeM, sizeL, sizeXL, size2XL, size3XL,
+    quantity, printType, deadline, zipcode, notes
   } = req.body;
 
   const file = req.file;
@@ -32,7 +33,7 @@ app.post('/submit', upload.single('logo'), (req, res) => {
     service: 'gmail',
     auth: {
       user: 'theprintstop619@gmail.com',
-      pass: 'opsufhhjhxplkkna' // Gmail App Password
+      pass: 'gbbzzvjiwrtepmfg'
     }
   });
 
@@ -46,12 +47,21 @@ Email: ${email}
 Unit: ${unit}
 Gear Type: ${gearType}
 Color: ${color}
-Size: ${size}
 Print Location: ${printLocation}
-Quantity: ${quantity}
 Print Type: ${printType}
 Deadline: ${deadline}
 Zip Code: ${zipcode}
+Total Quantity: ${quantity}
+
+Size Breakdown:
+XS: ${sizeXS}
+S: ${sizeS}
+M: ${sizeM}
+L: ${sizeL}
+XL: ${sizeXL}
+2XL: ${size2XL}
+3XL: ${size3XL}
+
 Notes: ${notes}
     `,
     attachments: file ? [{ path: file.path }] : []
@@ -59,47 +69,44 @@ Notes: ${notes}
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.error('Failed to send internal email:', error);
+      console.error('Error sending to owner:', error);
       return res.send('Error sending email.');
     } else {
-      console.log('Internal email sent:', info.response);
+      console.log('Owner email sent:', info.response);
 
-      if (email) {
-        const customerMailOptions = {
-          from: '"The Print Stop" <theprintstop619@gmail.com>',
-          to: email,
-          subject: 'Thank you for your quote request',
-          html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
-              <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                <h2 style="color: #333;">Thank you, ${name}!</h2>
-                <p style="font-size: 16px; color: #555;">
-                  We’ve received your quote request and our team is reviewing the details.
-                </p>
-                <p style="font-size: 16px; color: #555;">
-                  You can expect a follow-up from us soon with pricing or questions if we need anything clarified.
-                </p>
-                <p style="font-size: 16px; color: #555;">
-                  We appreciate the opportunity to serve your unit, team, or organization!
-                </p>
-                <hr style="margin: 30px 0;">
-                <p style="font-size: 14px; color: #888;">
-                  The Print Stop<br>
-                  theprintstop619@gmail.com
-                </p>
-              </div>
+      const customerMailOptions = {
+        from: '"The Print Stop" <theprintstop619@gmail.com>',
+        to: email,
+        subject: 'Thank you for your quote request',
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
+            <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+              <h2 style="color: #333;">Thank you, ${name}!</h2>
+              <p style="font-size: 16px; color: #555;">
+                We’ve received your quote request and our team is reviewing the details.
+              </p>
+              <p style="font-size: 16px; color: #555;">
+                You can expect a follow-up from us soon with pricing or any clarification needed.
+              </p>
+              <p style="font-size: 16px; color: #555;"><strong>Semper Fidelis.</strong></p>
+              <p style="font-size: 16px; color: #555;">Best regards,<br>The Print Stop Team</p>
+              <hr style="margin: 30px 0;">
+              <p style="font-size: 14px; color: #888;">
+                The Print Stop<br>
+                theprintstop619@gmail.com
+              </p>
             </div>
-          `
-        };
+          </div>
+        `
+      };
 
-        transporter.sendMail(customerMailOptions, (err, info) => {
-          if (err) {
-            console.error('Failed to send confirmation email:', err);
-          } else {
-            console.log('Confirmation email sent:', info.response);
-          }
-        });
-      }
+      transporter.sendMail(customerMailOptions, (err, info) => {
+        if (err) {
+          console.error('Failed to send confirmation email:', err);
+        } else {
+          console.log('Confirmation email sent:', info.response);
+        }
+      });
 
       if (file) fs.unlinkSync(file.path);
       res.send('Quote submitted successfully!');
