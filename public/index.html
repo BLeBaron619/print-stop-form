@@ -1,119 +1,76 @@
-const express = require('express');
-const multer = require('multer');
-const nodemailer = require('nodemailer');
-const path = require('path');
-const fs = require('fs');
-const app = express();
-const port = process.env.PORT || 3000;
-
-// Set up multer storage
-const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
-
-// Middleware
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
-
-// POST route for form submission
-app.post('/submit', upload.single('logo'), (req, res) => {
-  const {
-    name, email, unit, gearType, color, printLocation,
-    sizeXS, sizeS, sizeM, sizeL, sizeXL, size2XL, size3XL,
-    quantity, printType, deadline, zipcode, notes
-  } = req.body;
-
-  const file = req.file;
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'theprintstop619@gmail.com',
-      pass: 'wskosgvfpdohxypl'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Print Stop - Order Quote Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 100%; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; }
+    label { display: block; margin: 15px 0 5px; }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 20px; padding: 12px 20px; background: #222; color: #fff; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+    .result, .summary { margin-top: 20px; font-weight: bold; text-align: center; }
+    #sizeSummary { padding: 10px; background-color: #e6f7ff; border: 1px solid #b3d7ff; border-radius: 5px; }
+    @media (max-width: 600px) {
+      form { padding: 10px; }
     }
-  });
-
-  const mailOptions = {
-    from: 'theprintstop619@gmail.com',
-    to: 'theprintstop619@gmail.com',
-    subject: 'New Order Quote Request',
-    text: `
-Name: ${name}
-Email: ${email}
-Unit: ${unit}
-Gear Type: ${gearType}
-Color: ${color}
-Print Location: ${printLocation}
-Print Type: ${printType}
-Deadline: ${deadline}
-Zip Code: ${zipcode}
-Total Quantity: ${quantity}
-
-Size Breakdown:
-XS: ${sizeXS}
-S: ${sizeS}
-M: ${sizeM}
-L: ${sizeL}
-XL: ${sizeXL}
-2XL: ${size2XL}
-3XL: ${size3XL}
-
-Notes: ${notes}
-    `,
-    attachments: file ? [{ path: file.path }] : []
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending to owner:', error);
-      return res.send('Error sending email.');
-    } else {
-      console.log('Owner email sent:', info.response);
-
-      const customerMailOptions = {
-        from: '"The Print Stop" <theprintstop619@gmail.com>',
-        to: email,
-        subject: 'Thank you for your quote request',
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
-            <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-              <h2 style="color: #333;">Thank you, ${name}!</h2>
-              <p style="font-size: 16px; color: #555;">
-                We’ve received your quote request and our team is reviewing the details.
-              </p>
-              <p style="font-size: 16px; color: #555;">
-                You can expect a follow-up from us soon with pricing or any clarification needed.
-              </p>
-              <p style="font-size: 16px; color: #555;"><strong>Semper Fidelis.</strong></p>
-              <p style="font-size: 16px; color: #555;">Best regards,<br>The Print Stop Team</p>
-              <hr style="margin: 30px 0;">
-              <p style="font-size: 14px; color: #888;">
-                The Print Stop<br>
-                theprintstop619@gmail.com
-              </p>
-            </div>
-          </div>
-        `
-      };
-
-      transporter.sendMail(customerMailOptions, (err, info) => {
-        if (err) {
-          console.error('Failed to send confirmation email:', err);
-        } else {
-          console.log('Confirmation email sent:', info.response);
-        }
+  </style>
+  <script>
+    function updateQuantity() {
+      const sizeFields = ["sizeXS", "sizeS", "sizeM", "sizeL", "sizeXL", "size2XL", "size3XL"];
+      let total = 0;
+      let summaryHTML = "<strong>Size Breakdown:</strong><br>";
+      sizeFields.forEach(id => {
+        const elem = document.getElementById(id);
+        const label = document.querySelector(`label[for='${id}']`).innerText;
+        const value = parseInt(elem.value) || 0;
+        total += value;
+        summaryHTML += `${label}: ${value}<br>`;
       });
-
-      if (file) fs.unlinkSync(file.path);
-      res.send('Quote submitted successfully!');
+      document.getElementById("quantity").value = total;
+      document.getElementById("sizeSummary").innerHTML = summaryHTML + `<br><strong>Total: ${total}</strong>`;
     }
-  });
-});
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+    window.addEventListener('DOMContentLoaded', () => {
+      const sizeFields = ["sizeXS", "sizeS", "sizeM", "sizeL", "sizeXL", "size2XL", "size3XL"];
+      sizeFields.forEach(id => {
+        document.getElementById(id).addEventListener('change', updateQuantity);
+      });
+      updateQuantity();
+    });
+  </script>
+</head>
+<body>
+  <form id="quoteForm" action="/submit" method="POST" enctype="multipart/form-data">
+    <h2>Order Quote Request</h2>
+
+    <label for="sizeXS">XS</label>
+    <select id="sizeXS" name="sizeXS"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="sizeS">S</label>
+    <select id="sizeS" name="sizeS"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="sizeM">M</label>
+    <select id="sizeM" name="sizeM"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="sizeL">L</label>
+    <select id="sizeL" name="sizeL"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="sizeXL">XL</label>
+    <select id="sizeXL" name="sizeXL"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="size2XL">2XL</label>
+    <select id="size2XL" name="size2XL"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="size3XL">3XL</label>
+    <select id="size3XL" name="size3XL"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select>
+
+    <label for="quantity">Total Quantity</label>
+    <input type="number" id="quantity" name="quantity" readonly />
+
+    <div class="summary" id="sizeSummary"></div>
+  </form>
+</body>
+</html>
