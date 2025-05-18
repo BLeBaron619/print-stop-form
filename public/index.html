@@ -1,86 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Print Stop - Order Quote Form</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f4; }
-    form { background: #fff; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h2 { text-align: center; }
-    label { display: block; margin: 15px 0 5px; }
-    input, select, textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
-    button { margin-top: 20px; padding: 12px 20px; background: #222; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-    .result { margin-top: 20px; font-weight: bold; text-align: center; }
-  </style>
-</head>
-<body>
-  <form id="quoteForm" action="/submit" method="POST" enctype="multipart/form-data">
-    <h2>Order Quote Request</h2>
-    <label for="name">Contact Name</label>
-    <input type="text" id="name" name="name" required>
+const express = require('express');
+const multer = require('multer');
+const nodemailer = require('nodemailer');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+const port = process.env.PORT || 3000;
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" required>
+// Set up multer storage
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
 
-    <label for="unit">Unit/Company/Organization Name</label>
-    <input type="text" id="unit" name="unit">
+// Middleware
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 
-    <label for="gearType">Type of Gear</label>
-    <select id="gearType" name="gearType">
-      <option value="shortSleeve">Short Sleeve Shirt</option>
-      <option value="longSleeve">Long Sleeve Shirt</option>
-      <option value="polo">Polo</option>
-      <option value="hat">Hat</option>
-      <option value="hoodie">Hoodie</option>
-      <option value="crewneck">Crew Neck Sweater</option>
-    </select>
+// POST route for form submission
+app.post('/submit', upload.single('logo'), (req, res) => {
+  const {
+    name, email, unit, gearType, color, printLocation,
+    sizeXS, sizeS, sizeM, sizeL, sizeXL, size2XL, size3XL,
+    quantity, printType, deadline, zipcode, notes
+  } = req.body;
 
-    <label for="color">Color</label>
-    <select id="color" name="color">
-      <option value="black">Black</option>
-      <option value="white">White</option>
-      <option value="red">Red</option>
-      <option value="blue">Blue</option>
-      <option value="green">Green</option>
-      <option value="yellow">Yellow</option>
-      <option value="gray">Gray</option>
-      <option value="orange">Orange</option>
-      <option value="purple">Purple</option>
-    </select>
+  const file = req.file;
 
-    <label for="printLocation">Print Location</label>
-    <select id="printLocation" name="printLocation">
-      <option value="leftChest">Left Chest Only</option>
-      <option value="backOnly">Back Only</option>
-      <option value="chestAndBack">Left Chest and Back</option>
-      <option value="largeChestAndBack">Large Chest and Back</option>
-      <option value="hat">Hat</option>
-    </select>
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'theprintstop619@gmail.com',
+      pass: 'wskosgvfpdohxypl'
+    }
+  });
 
-    <label for="quantity">Quantity</label>
-    <input type="number" id="quantity" name="quantity" min="1" required>
+  const mailOptions = {
+    from: 'theprintstop619@gmail.com',
+    to: 'theprintstop619@gmail.com',
+    subject: 'New Order Quote Request',
+    text: `
+Name: ${name}
+Email: ${email}
+Unit: ${unit}
+Gear Type: ${gearType}
+Color: ${color}
+Print Location: ${printLocation}
+Print Type: ${printType}
+Deadline: ${deadline}
+Zip Code: ${zipcode}
+Total Quantity: ${quantity}
 
-    <label for="printType">Print Type</label>
-    <select id="printType" name="printType">
-      <option value="screen">Screen Printing</option>
-      <option value="embroidery">Embroidery</option>
-    </select>
+Size Breakdown:
+XS: ${sizeXS}
+S: ${sizeS}
+M: ${sizeM}
+L: ${sizeL}
+XL: ${sizeXL}
+2XL: ${size2XL}
+3XL: ${size3XL}
 
-    <label for="deadline">Deadline</label>
-    <input type="date" id="deadline" name="deadline">
+Notes: ${notes}
+    `,
+    attachments: file ? [{ path: file.path }] : []
+  };
 
-    <label for="zipcode">Shipping Zip Code</label>
-    <input type="text" id="zipcode" name="zipcode">
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending to owner:', error);
+      return res.send('Error sending email.');
+    } else {
+      console.log('Owner email sent:', info.response);
 
-    <label for="logo">Upload Logo or Design</label>
-    <input type="file" id="logo" name="logo" accept="image/*">
+      const customerMailOptions = {
+        from: '"The Print Stop" <theprintstop619@gmail.com>',
+        to: email,
+        subject: 'Thank you for your quote request',
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4;">
+            <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+              <h2 style="color: #333;">Thank you, ${name}!</h2>
+              <p style="font-size: 16px; color: #555;">
+                We’ve received your quote request and our team is reviewing the details.
+              </p>
+              <p style="font-size: 16px; color: #555;">
+                You can expect a follow-up from us soon with pricing or any clarification needed.
+              </p>
+              <p style="font-size: 16px; color: #555;"><strong>Semper Fidelis.</strong></p>
+              <p style="font-size: 16px; color: #555;">Best regards,<br>The Print Stop Team</p>
+              <hr style="margin: 30px 0;">
+              <p style="font-size: 14px; color: #888;">
+                The Print Stop<br>
+                theprintstop619@gmail.com
+              </p>
+            </div>
+          </div>
+        `
+      };
 
-    <label for="notes">Additional Notes or Requests</label>
-    <textarea id="notes" name="notes" rows="4"></textarea>
+      transporter.sendMail(customerMailOptions, (err, info) => {
+        if (err) {
+          console.error('Failed to send confirmation email:', err);
+        } else {
+          console.log('Confirmation email sent:', info.response);
+        }
+      });
 
-    <button type="submit">Get Quote</button>
-    <div class="result" id="quoteResult"></div>
-  </form>
-</body>
-</html>
+      if (file) fs.unlinkSync(file.path);
+      res.send('Quote submitted successfully!');
+    }
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
