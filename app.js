@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/submit', upload.single('logo'), (req, res) => {
   const {
     name, email, unit, gearType, color, printLocation,
-    quantity, printType, deadline, zipcode, notes
+    size, quantity, printType, deadline, zipcode, notes
   } = req.body;
 
   const file = req.file;
@@ -32,7 +32,7 @@ app.post('/submit', upload.single('logo'), (req, res) => {
     service: 'gmail',
     auth: {
       user: 'theprintstop619@gmail.com',
-      pass: 'ddemkjnpgveznuzd' // App password — no spaces
+      pass: 'opsufhhjhxplkkna' // Gmail App Password
     }
   });
 
@@ -46,6 +46,7 @@ Email: ${email}
 Unit: ${unit}
 Gear Type: ${gearType}
 Color: ${color}
+Size: ${size}
 Print Location: ${printLocation}
 Quantity: ${quantity}
 Print Type: ${printType}
@@ -63,7 +64,6 @@ Notes: ${notes}
     } else {
       console.log('Internal email sent:', info.response);
 
-      // Send HTML confirmation email to customer
       if (email) {
         const customerMailOptions = {
           from: '"The Print Stop" <theprintstop619@gmail.com>',
